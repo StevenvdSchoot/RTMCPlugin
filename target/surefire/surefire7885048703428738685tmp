@@ -1,0 +1,5 @@
+#surefire
+#Wed Feb 06 00:27:37 CET 2013
+user.dir=/home/steven/RTMC/RTMCPlugin
+localRepository=/home/steven/.m2/repository
+basedir=/home/steven/RTMC/RTMCPlugin
