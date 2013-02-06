@@ -77,11 +77,19 @@
       <id>repobo-snap</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
+    <repository>
+      <id>rtmcplugin-repo</id>
+      <url>file://${basedir}/lib</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>bukkit-plugins</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>rtmcplugin-repo</id>
+      <url>file://${basedir}/lib</url>
     </pluginRepository>
   </pluginRepositories>
   <dependencies>

@@ -33,10 +33,6 @@
             <id>bukkit-plugins</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
         </pluginRepository>
-        <pluginRepository>
-            <id>rtmcplugin-repo</id>
-            <url>file://${basedir}/lib</url>
-        </pluginRepository>
     </pluginRepositories>
 
     <build>

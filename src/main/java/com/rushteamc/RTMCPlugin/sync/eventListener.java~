@@ -26,7 +26,7 @@ public class eventListener implements Listener
 	{
 		this.syncmain = syncmain;
 		this.config = config;
-		permissions = PermissionsEx.getPermissionManager();
+		//permissions = PermissionsEx.getPermissionManager();
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)

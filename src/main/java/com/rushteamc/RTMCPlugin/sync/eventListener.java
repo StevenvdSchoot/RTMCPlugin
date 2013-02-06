@@ -10,15 +10,15 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 
 import com.rushteamc.RTMCPlugin.sync.message.*;
-/*
+
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
-*/
+
 public class eventListener implements Listener
 {
-	//private PermissionManager permissions;
+	private PermissionManager permissions;
 	private FileConfiguration config;
 	syncMain syncmain;
 	
@@ -26,13 +26,12 @@ public class eventListener implements Listener
 	{
 		this.syncmain = syncmain;
 		this.config = config;
-		//permissions = PermissionsEx.getPermissionManager();
+		permissions = PermissionsEx.getPermissionManager();
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onAsyncPlayerChatFirst(AsyncPlayerChatEvent event)
 	{
-		/*
 		Player player = event.getPlayer();
 		String worldName = player.getWorld().getName();
 		PermissionUser user = permissions.getUser(player);
@@ -47,7 +46,6 @@ public class eventListener implements Listener
 		if( config.isString("chat.worlds." + worldName ) )
 			worldName = config.getString("chat.worlds." + worldName ).replace('&', ChatColor.COLOR_CHAR);
 		event.setFormat( config.getString("chat.format").replace('&', ChatColor.COLOR_CHAR).replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", userGroup.getName() + ChatColor.RESET).replace("{PLAYERNAME}", "%s" + ChatColor.RESET).replace("{MESSAGE}", "%s" + ChatColor.RESET) );
-		*/
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
