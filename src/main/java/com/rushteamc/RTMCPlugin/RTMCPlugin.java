@@ -22,8 +22,11 @@ public class RTMCPlugin extends JavaPlugin
 	
 	public void onEnable()
 	{
+		System.out.println("[RTMCPlugin] Initiazing synchronizer!");
 		sync = new syncMain(this);
+		System.out.println("[RTMCPlugin] Initiazing adminchat!");
 		adminChat = new adminChatMain(this);
+		System.out.println("[RTMCPlugin] Done initiazing!");
 		//Bukkit.addFakeOnline("test");
 		//getServer().addFakeOnline("test1");
 		//getServer().addFakeOnline("test2");

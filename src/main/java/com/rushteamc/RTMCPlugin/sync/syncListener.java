@@ -1,7 +1,6 @@
 package com.rushteamc.RTMCPlugin.sync;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,39 +11,76 @@ import com.rushteamc.RTMCPlugin.sync.message.*;
 
 public class syncListener extends Thread
 {
+	public static final String PIPE_PATH = "/dev/shm/RTMCPlugin/pipes/server_";
+
 	private ServerSocket connectionSocket;
 	private Socket dataSocket;
-	private boolean running = true;
 	private int port;
+
+	private boolean running = true;
+	private int pipeNum = 2;
+	private File fd;
+	private InputStream inputStream;
+	private ObjectInputStream objectInputStream;
 	
 	public syncListener(int port) throws IOException
 	{
+		pipeNum = port;
 		setDaemon(true);
-		this.port = port;
-		connectionSocket = new ServerSocket(port);
-		System.out.println("[RTMCPlugin][SYNC] Listening on port " + port );
-	}
-	
-	public void kill()
-	{
-		running = false;
-		try {
-			dataSocket.close();
-		} catch (IOException e) {
+
+		fd = new File(PIPE_PATH + pipeNum);
+		if( !fd.mkdirs() )
+			;
+
+		if(fd.exists())
+			fd.delete();
+		/*while( fd.exists() )
+		{
+			pipeNum++;
+			fd = new File(PIPE_PATH + pipeNum);
+		}*/
+
+		try
+		{
+			Process p=Runtime.getRuntime().exec("mkfifo --mode=666 " + PIPE_PATH + pipeNum);
+			p.waitFor();
+		}
+		catch(InterruptedException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	public void kill()
+	{
+		running = false;
+		try { // Extremly ugly way to force FileInputStream(PIPE_PATH + pipeNum) to unblock... 
+			OutputStream outputStream = new FileOutputStream(PIPE_PATH + pipeNum);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+			objectOutputStream.writeObject( null );
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		this.interrupt();
+	}
+	
 	public void run()
 	{
+		System.out.println("[RTMCPlugin][SYNC] Listening on pipe " + PIPE_PATH + pipeNum );
 		while(running)
 		{
 			try {
-				dataSocket = connectionSocket.accept();
-				ObjectInputStream ois = new ObjectInputStream(dataSocket.getInputStream( ));
-				message msg = (message)ois.readObject();
-				dataSocket.close();
+				if(objectInputStream==null)
+				{
+					try {
+						inputStream = new FileInputStream(PIPE_PATH + pipeNum);
+						objectInputStream = new ObjectInputStream(inputStream);
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
+				}
+				message msg = (message)objectInputStream.readObject();
 				switch(msg.type)
 				{
 				case CHAT_PUBLIC:
@@ -79,29 +115,28 @@ public class syncListener extends Thread
 					System.out.println("[RTMCPlugin][SYNC] Received message with unknown type!");
 				}
 			} catch (IOException e) {
+				// System.out.println("[RTMCPlugin][SYNC] Cought IOException, trying to reconnect!");
 				try {
-					if(connectionSocket != null)
-					{
-						try {
-							connectionSocket.close();
-						} catch (IOException e1) {}
-						connectionSocket = null;
-					}
-					connectionSocket = new ServerSocket(port);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					inputStream = new FileInputStream(PIPE_PATH + pipeNum);
+					objectInputStream = new ObjectInputStream(inputStream);
+				} catch(IOException e2) {
+					e2.printStackTrace();
+					running = false;
 				}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		try {
-			connectionSocket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		System.out.println("[RTMCPlugin][SYNC][listener] Listener closed! Please reopen by typing \"/rtmcplugin sync reset\" in the console.");
+		if(objectInputStream != null)
+			try {objectInputStream.close();} catch (IOException e) {}
+		if(inputStream != null)
+			try {inputStream.close();} catch (IOException e) {}
+		fd = new File(PIPE_PATH + pipeNum);
+		if( fd.exists() )
+			fd.delete();
+
 	}
 }

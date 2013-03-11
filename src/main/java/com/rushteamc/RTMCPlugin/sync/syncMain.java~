@@ -1,14 +1,13 @@
 package com.rushteamc.RTMCPlugin.sync;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.rushteamc.RTMCPlugin.main;
+import com.rushteamc.RTMCPlugin.RTMCPlugin;
 import com.rushteamc.RTMCPlugin.sync.message.message;
 
 public class syncMain
@@ -23,11 +22,43 @@ public class syncMain
 	private syncListener listener;
 	private Socket clientSocket;
 	private ObjectOutputStream oos;
+
+	private int port;
 	
 	public syncMain(RTMCPlugin main)
 	{
 		FileConfiguration config = main.getConfig();
+		int recvPort = 1;
+		if(config.isInt("sync.ports.own"))
+			recvPort = (int)config.get("sync.ports.own");
 
+		int sendPort[] = {0};
+		if(config.isInt("sync.ports.others"))
+			sendPort = new int[] {(int)config.get("sync.ports.others")};
+		else if(config.isList("sync.ports.others"))
+		{
+			ArrayList list = (ArrayList)config.get("sync.ports.others");
+			sendPort = new int[ list.size() ];
+			for( int i = 0 ; i < list.size() ; i++ )
+			{
+				Object obj = list.get(i);
+				if( obj instanceof Integer )
+				{
+					sendPort[i] = (int)obj;
+				}
+				else if( obj instanceof String )
+				{
+					sendPort[i] = Integer.parseInt((String)obj);
+				}
+				else
+				{
+					System.out.println("[RTMCPlugin][SYNC] Invalid class of type: " + list.get(i).getClass().getCanonicalName() );
+				}
+			}
+		}
+
+		port = sendPort[0];
+/*
 		if(config.isInt("sync.ports.own"))
 			syncReceiverPort = (int)config.get("sync.ports.own");
 
@@ -54,7 +85,7 @@ public class syncMain
 				}
 			}
 		}
-		
+*/
 		/*
 		if(config.isInt("sync.side"))
 			syncside = (int)config.get("sync.side");
@@ -77,7 +108,9 @@ public class syncMain
 		*/
 		
 		try {
-			listener = new syncListener(syncReceiverPort);
+			System.out.println("[RTMCPlugin][sync] Creating listener...");
+			listener = new syncListener(recvPort);
+			System.out.println("[RTMCPlugin][sync] Starting listener...");
 			listener.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -85,7 +118,7 @@ public class syncMain
 		}
 
 		main.getServer().getPluginManager().registerEvents(new eventListener(this, config), main);
-
+/*
 		try {
 			openSocket();
 			System.out.println("[RTMCPlugin][SYNC] Connected to port " + syncTransmitterPorts[0] );
@@ -107,11 +140,12 @@ public class syncMain
 				e2.printStackTrace();
 			}
 		}
-		
+*/
 	}
 
 	public void resetIn()
 	{
+/*
 		closeListener();
 		try {
 			listener = new syncListener(syncReceiverPort);
@@ -122,10 +156,12 @@ public class syncMain
 			return;
 		}
 		System.out.println("[RTMCPlugin][SYNC] Reseted input connection!");
+*/
 	}
 
 	public void resetOut()
 	{
+/*
 		try {
 			openSocket();
 		} catch (IOException e) {
@@ -134,6 +170,7 @@ public class syncMain
 			return;
 		}
 		System.out.println("[RTMCPlugin][SYNC] Reseted output connection!");
+*/
 	}
 	
 	public void unload()
@@ -170,6 +207,7 @@ public class syncMain
 	
 	private void closeSocket()
 	{
+/*
 		try {
 			if( oos != null)
 			{
@@ -188,10 +226,12 @@ public class syncMain
 		}
 		oos = null;
 		clientSocket = null;
+*/
 	}
 	
 	private void openSocket() throws IOException
 	{
+/*
 		closeSocket();
 		System.out.println("[RTMCPlugin][SYNC] Connecting to port "+syncTransmitterPorts[0]+"...");
 		InetAddress host = InetAddress.getByName("localhost");
@@ -199,10 +239,19 @@ public class syncMain
 		clientSocket = new Socket(host, syncTransmitterPorts[0]);
 		System.out.println("[RTMCPlugin][SYNC] Connecting to port "+syncTransmitterPorts[0]+"...");
 		oos = new ObjectOutputStream(clientSocket.getOutputStream());
+*/
 	}
 	
 	public void sendMessage(message message)
 	{
+		try {
+			OutputStream outputStream = new FileOutputStream("/dev/shm/RTMCPlugin/pipes/server_"+port);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+			objectOutputStream.writeObject( message );
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+/*
 		try {
 			if(oos==null)
 				openSocket();
@@ -217,6 +266,7 @@ public class syncMain
 				System.out.println("[RTMCPlugin][SYNC] Could not connect to other server!");
 			}
 		}
+*/
 	}
 	
 }
