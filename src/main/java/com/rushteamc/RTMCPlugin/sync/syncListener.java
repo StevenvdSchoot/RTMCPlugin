@@ -26,6 +26,9 @@ public class syncListener extends Thread
 	
 	public syncListener(int port) throws IOException
 	{
+		/**
+		 * TODO: The syncListener should work similarly as the syncSender.
+		 */
 		pipeNum = port;
 		setDaemon(true);
 
