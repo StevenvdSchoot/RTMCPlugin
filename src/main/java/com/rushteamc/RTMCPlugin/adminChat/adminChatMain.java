@@ -14,11 +14,13 @@ import com.rushteamc.RTMCPlugin.sync.message.adminChat;
 public class adminChatMain
 {
 	private RTMCPlugin main;
+	private static String format;
 	
 	public adminChatMain(RTMCPlugin main)
 	{
 		this.main = main;
 		main.getServer().getPluginManager().registerEvents(new adminChatEventListener(this), main);
+		format = main.getConfig().getString("chat.format.adminchat").replace('&', ChatColor.COLOR_CHAR);
 	}
 	
 	public static boolean getAdminChatEnabled(Player player)
@@ -46,7 +48,8 @@ public class adminChatMain
 	
 	public static void sendAdminChatMessage(String playername, String msg)
 	{
-		String str = ChatColor.RED + "[ADMINCHAT][" + playername + "]: " + msg;
+		//String str = ChatColor.RED + "[ADMINCHAT][" + playername + "]: " + msg;
+		String str = format.replace("{PLAYERNAME}", playername + ChatColor.RESET).replace("{MESSAGE}", msg + ChatColor.RESET);
 		for(Player player : Bukkit.getServer().getOnlinePlayers() )
 		{
 			if( player.hasPermission("RTMCPlugin.adminchat.listen") )

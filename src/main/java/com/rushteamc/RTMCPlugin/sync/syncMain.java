@@ -1,11 +1,6 @@
 package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.Pipe;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.ArrayList;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -14,134 +9,103 @@ import com.rushteamc.RTMCPlugin.sync.message.message;
 
 public class syncMain
 {
-	public static final String PIPE_PATH = "/dev/shm/RTMCPlugin/pipes/server_"; // TODO: make this configurable
-	
 	public int syncReceiverPort; // TODO: remove this variable
 	public int[] syncTransmitterPorts = new int[0]; // TODO: remove this variable
 	
-	private syncListener listener; // TODO: Improve to allow more then two servers
-	private syncSender sender; // TODO: Improve to allow more than two server
-	private Socket clientSocket; // TODO: remove variable
-	private ObjectOutputStream oos; // TODO: remove variable
-
-	private int port; // TODO: Improve to allow more then two server
+	private String pipe_prefix;
+	private int numServers;
+	private int serverID;
+	private syncListener listeners[];
+	private syncSender senders[];
 	
 	public syncMain(RTMCPlugin main)
 	{
-		/**
-		 * TODO: The config reding should change to a system where you only give the number
-		 * of servers running parallel, in the config. The current ID of the server will
-		 * then be determined by checking the current existing pipes and assuming every
-		 * pipe is actualy used.
-		 * The name of the pipe will be formated as follow:
-		 * PIPE_PREFIX + "_" + listening server ID + "_" + sending server ID
-		 */
 		FileConfiguration config = main.getConfig();
-		int recvPort = 1;
-		if(config.isInt("sync.ports.own"))
-			recvPort = (int)config.get("sync.ports.own");
-
-		int sendPort[] = {0};
-		if(config.isInt("sync.ports.others"))
-			sendPort = new int[] {(int)config.get("sync.ports.others")};
-		else if(config.isList("sync.ports.others"))
+		
+		if(config.isString("sync.path"))
+			pipe_prefix = (String)config.get("sync.path");
+		else
+			pipe_prefix = "/dev/shm/RTMCPlugin/pipes/server";
+		
+		if(config.isInt("sync.servers"))
+			numServers = (int)config.get("sync.servers");
+		else if(config.isString("sync.servers"))
+			numServers = Integer.parseInt((String)config.get("sync.servers"));
+		else
+			numServers = 0;
+		
+		if(numServers > 1)
 		{
-			ArrayList list = (ArrayList)config.get("sync.ports.others");
-			sendPort = new int[ list.size() ];
-			for( int i = 0 ; i < list.size() ; i++ )
+			listeners = new syncListener[numServers-1];
+			senders = new syncSender[numServers-1];
+			
+			serverID = 0;
+			while(new File(pipe_prefix + "_" + String.valueOf(serverID) + "_" + String.valueOf(numServers-1)).exists())
+				serverID++;
+			if(serverID == numServers-1)
+				if(new File(pipe_prefix + "_" + String.valueOf(serverID) + "_0").exists())
+					serverID++;
+			if(serverID>=numServers)
 			{
-				Object obj = list.get(i);
-				if( obj instanceof Integer )
-				{
-					sendPort[i] = (int)obj;
-				}
-				else if( obj instanceof String )
-				{
-					sendPort[i] = Integer.parseInt((String)obj);
-				}
-				else
-				{
-					System.out.println("[RTMCPlugin][SYNC] Invalid class of type: " + list.get(i).getClass().getCanonicalName() );
-				}
+				System.out.println("[RTMCPlugin][SYNC] All server IDs in use! Could not setup synchronizer.");
+				return;
+			}
+			
+			int i;
+			for(i = 0;i<serverID;i++)
+			{
+				listeners[i] = new syncListener(pipe_prefix + "_" + String.valueOf(serverID) + "_" + String.valueOf(i) );
+				listeners[i].start();
+			}
+			for(i=serverID+1;i<numServers;i++)
+			{
+				listeners[i-1] = new syncListener(pipe_prefix + "_" + String.valueOf(serverID) + "_" + String.valueOf(i) );
+				listeners[i-1].start();
+			}
+			
+			for(i = 0;i<serverID;i++)
+			{
+				senders[i] = new syncSender(pipe_prefix + "_" + String.valueOf(i) + "_" + String.valueOf(serverID) );
+				senders[i].start();
+			}
+			for(i = serverID+1;i<numServers;i++)
+			{
+				senders[i-1] = new syncSender(pipe_prefix + "_" + String.valueOf(i) + "_" + String.valueOf(serverID) );
+				senders[i-1].start();
 			}
 		}
 
-		port = sendPort[0];
-		
-		try {
-			System.out.println("[RTMCPlugin][sync] Creating listener...");
-			listener = new syncListener(recvPort);
-			System.out.println("[RTMCPlugin][sync] Starting listener...");
-			listener.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("[RTMCPlugin][sync] Creating listener...");
-		sender = new syncSender(PIPE_PATH + port);
-		System.out.println("[RTMCPlugin][sync] Starting listener...");
-		sender.start();
-
 		main.getServer().getPluginManager().registerEvents(new eventListener(this, config), main);
-	}
-
-	public void resetIn()
-	{
-		// TODO: remove empty method
-	}
-
-	public void resetOut()
-	{
-		// TODO: remove empty method
 	}
 	
 	public void unload()
 	{
-		System.out.println("[RTMCPlugin][SYNC] Clossing listening thread...");
-		closeListener();
-		System.out.println("[RTMCPlugin][SYNC] Closing writing ports...");
-		closeSocket();
-	}
-	
-	private void closeListener()
-	{
-		if(listener != null)
+		for(syncListener listener : listeners)
 			listener.kill();
-		try {
-			if( oos != null)
-				oos.close();
-			if( clientSocket != null)
-				clientSocket.close();
-		} catch (IOException e) {
-			;
-		}
-		try {
-			if( listener != null && listener.isAlive() )
-			{
+		for(syncListener listener : listeners)
+			try {
 				listener.join();
-				listener = null;
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void closeSocket()
-	{
-		// TODO: remove empty method
-	}
-	
-	private void openSocket() throws IOException
-	{
-		// TODO: remove empty method
+
+		for(syncSender sender : senders)
+			sender.kill();
+		for(syncSender sender : senders)
+			try {
+				sender.join();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 	}
 	
 	public void sendMessage(message message)
 	{
 		// TODO: Extend for infinit servers (more than two)
-		sender.sendMessage(message);
+		for(syncSender sender : senders)
+			sender.sendMessage(message);
 	}
 	
 }

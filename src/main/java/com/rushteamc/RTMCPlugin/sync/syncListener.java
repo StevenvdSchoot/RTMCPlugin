@@ -1,8 +1,6 @@
 package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,45 +10,32 @@ import com.rushteamc.RTMCPlugin.sync.message.*;
 
 public class syncListener extends Thread
 {
-	public static final String PIPE_PATH = "/dev/shm/RTMCPlugin/pipes/server_";
-
-	private ServerSocket connectionSocket;
-	private Socket dataSocket;
-	private int port;
-
 	private boolean running = true;
-	private int pipeNum = 2;
+	private String filename;
 	private File fd;
 	private InputStream inputStream;
 	private ObjectInputStream objectInputStream;
 	
-	public syncListener(int port) throws IOException
+	public syncListener(String filename)
 	{
-		/**
-		 * TODO: The syncListener should work similarly as the syncSender.
-		 */
-		pipeNum = port;
 		setDaemon(true);
+		
+		this.filename = filename;
 
-		fd = new File(PIPE_PATH + pipeNum);
+		fd = new File(filename);
 		if( !fd.mkdirs() )
-			;
+			; // TODO: Do some error handling...
 
 		if(fd.exists())
 			fd.delete();
-		/*while( fd.exists() )
-		{
-			pipeNum++;
-			fd = new File(PIPE_PATH + pipeNum);
-		}*/
 
-		try
-		{
-			Process p=Runtime.getRuntime().exec("mkfifo --mode=666 " + PIPE_PATH + pipeNum);
+		try {
+			Process p = Runtime.getRuntime().exec("mkfifo --mode=666 " + filename);
 			p.waitFor();
-		}
-		catch(InterruptedException e)
-		{
+		} catch(InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -60,9 +45,11 @@ public class syncListener extends Thread
 	{
 		running = false;
 		try { // Extremly ugly way to force FileInputStream(PIPE_PATH + pipeNum) to unblock... 
-			OutputStream outputStream = new FileOutputStream(PIPE_PATH + pipeNum);
+			OutputStream outputStream = new FileOutputStream(filename);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 			objectOutputStream.writeObject( null );
+			objectOutputStream.close();
+			outputStream.close();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -71,20 +58,29 @@ public class syncListener extends Thread
 			fd.delete();
 	}
 	
+	private void sendToAllOnlinePlayers(String str)
+	{
+		System.out.println("[RTMCPlugin][SYNC] Broadcasting message: " + str);
+		for(Player p : Bukkit.getOnlinePlayers()){
+			p.sendMessage(str);
+		}
+	}
+	
 	public void run()
 	{
-		System.out.println("[RTMCPlugin][SYNC] Listening on pipe " + PIPE_PATH + pipeNum );
+		System.out.println("[RTMCPlugin][SYNC] Trying to listen to: " + filename);
 		while(running)
 		{
 			try {
 				if(objectInputStream==null)
 				{
 					try {
-						inputStream = new FileInputStream(PIPE_PATH + pipeNum);
+						inputStream = new FileInputStream(filename);
 						objectInputStream = new ObjectInputStream(inputStream);
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
+					System.out.println("[RTMCPlugin][SYNC] Connected to: " + filename);
 				}
 				message msg = (message)objectInputStream.readObject();
 				switch(msg.type)
@@ -92,11 +88,7 @@ public class syncListener extends Thread
 				case CHAT_PUBLIC:
 					publicChat pcm = (publicChat)msg;
 					// Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
-					System.out.println("[RTMCPlugin][SYNC][listener] Sending message: " + String.format(pcm.format,pcm.playerName,pcm.message));
-					String str = String.format(pcm.format,pcm.playerName,pcm.message);
-					for(Player p : Bukkit.getOnlinePlayers()){
-						p.sendMessage(str);
-					}
+					sendToAllOnlinePlayers(String.format(pcm.format,pcm.playerName,pcm.message));
 					break;
 				case CHAT_ADMIN:
 					adminChat amc = (adminChat)msg;
@@ -104,48 +96,47 @@ public class syncListener extends Thread
 					break;
 				case CHAT_ME:
 					meChat mc = (meChat)msg;
-					Bukkit.getServer().broadcastMessage( "* " + mc.playerName + " " + mc.message );
+					sendToAllOnlinePlayers( "* " + mc.playerName + " " + mc.message );
 					break;
 				case PLAYER_JOIN:
 					playerJoin pj = (playerJoin)msg;
-					Bukkit.getServer().broadcastMessage( pj.message );
+					sendToAllOnlinePlayers( pj.message );
 					break;
 				case PLAYER_LEAVE:
 					playerLeave pl = (playerLeave)msg;
-					Bukkit.getServer().broadcastMessage( pl.message );
+					sendToAllOnlinePlayers( pl.message );
 					break;
 				case PLAYER_KICK:
 					playerKick pk = (playerKick)msg;
-					Bukkit.getServer().broadcastMessage( pk.message );
+					sendToAllOnlinePlayers( pk.message );
 					break;
 				case PLAYER_DEATH:
 					playerDeath pd = (playerDeath)msg;
-					Bukkit.getServer().broadcastMessage( pd.message );
+					sendToAllOnlinePlayers( pd.message );
 					break;
 				default:
-					System.out.println("[RTMCPlugin][SYNC] Received message with unknown type!");
+					sendToAllOnlinePlayers("[RTMCPlugin][SYNC] Received message with unknown type!");
 				}
 			} catch (IOException e) {
-				// System.out.println("[RTMCPlugin][SYNC] Cought IOException, trying to reconnect!");
 				try {
-					inputStream = new FileInputStream(PIPE_PATH + pipeNum);
-					objectInputStream = new ObjectInputStream(inputStream);
+					objectInputStream.close();
+					inputStream.close();
 				} catch(IOException e2) {
 					e2.printStackTrace();
-					running = false;
 				}
+				objectInputStream = null;
+				inputStream = null;
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
-		System.out.println("[RTMCPlugin][SYNC][listener] Listener closed! Please reopen by typing \"/rtmcplugin sync reset\" in the console.");
+		System.out.println("[RTMCPlugin][SYNC] Listener closed! Please reopen by typing \"/rtmcplugin sync reset\" in the console.");
 		if(objectInputStream != null)
 			try {objectInputStream.close();} catch (IOException e) {}
 		if(inputStream != null)
 			try {inputStream.close();} catch (IOException e) {}
-		fd = new File(PIPE_PATH + pipeNum);
+		fd = new File(filename);
 		if( fd.exists() )
 			fd.delete();
 

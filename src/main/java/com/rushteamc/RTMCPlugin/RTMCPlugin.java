@@ -1,7 +1,5 @@
 package com.rushteamc.RTMCPlugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -84,16 +82,20 @@ public class RTMCPlugin extends JavaPlugin
 				switch(args[i])
 				{
 				case "in":
+					/*
 					if(sync == null)
 						sync = new syncMain(this);
 					else
 						sync.resetIn();
+					*/
 					break;
 				case "out":
+					/*
 					if(sync == null)
 						sync = new syncMain(this);
 					else
 						sync.resetOut();
+					*/
 					break;
 				default:
 					sender.sendMessage(args[i] + " is not a valid action for reload, usage:\n" + cmd.getUsage() + " [in|out]" );

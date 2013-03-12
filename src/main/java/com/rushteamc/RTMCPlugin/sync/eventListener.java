@@ -21,12 +21,14 @@ public class eventListener implements Listener
 	private PermissionManager permissions;
 	private FileConfiguration config;
 	syncMain syncmain;
+	private String format;
 	
 	public eventListener(syncMain syncmain, FileConfiguration config)
 	{
 		this.syncmain = syncmain;
 		this.config = config;
 		permissions = PermissionsEx.getPermissionManager();
+		format = config.getString("chat.format.default").replace('&', ChatColor.COLOR_CHAR);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -45,7 +47,7 @@ public class eventListener implements Listener
 		}
 		if( config.isString("chat.worlds." + worldName ) )
 			worldName = config.getString("chat.worlds." + worldName ).replace('&', ChatColor.COLOR_CHAR);
-		event.setFormat( config.getString("chat.format").replace('&', ChatColor.COLOR_CHAR).replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", userGroup.getName() + ChatColor.RESET).replace("{PLAYERNAME}", "%s" + ChatColor.RESET).replace("{MESSAGE}", "%s" + ChatColor.RESET) );
+		event.setFormat( format.replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", userGroup.getName() + ChatColor.RESET).replace("{PLAYERNAME}", "%s" + ChatColor.RESET).replace("{MESSAGE}", "%s" + ChatColor.RESET) );
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
