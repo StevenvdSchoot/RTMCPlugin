@@ -1,6 +1,8 @@
 package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
+import java.nio.*;
+import java.nio.channels.Pipe;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import com.rushteamc.RTMCPlugin.sync.message.message;
 
 public class syncMain
 {
+	public static final String PIPE_PATH = "/dev/shm/RTMCPlugin/pipes/server_";
 	//private int syncside = 0;
 	public int syncReceiverPort;
 	public int[] syncTransmitterPorts = new int[0];
@@ -20,6 +23,7 @@ public class syncMain
 	//private final static int PORT_1 = 1235;
 	
 	private syncListener listener;
+	private syncSender sender;
 	private Socket clientSocket;
 	private ObjectOutputStream oos;
 
@@ -116,6 +120,11 @@ public class syncMain
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println("[RTMCPlugin][sync] Creating listener...");
+		sender = new syncSender(PIPE_PATH + port);
+		System.out.println("[RTMCPlugin][sync] Starting listener...");
+		sender.start();
 
 		main.getServer().getPluginManager().registerEvents(new eventListener(this, config), main);
 /*
@@ -244,6 +253,8 @@ public class syncMain
 	
 	public void sendMessage(message message)
 	{
+		sender.sendMessage(message);
+		/*
 		try {
 			OutputStream outputStream = new FileOutputStream("/dev/shm/RTMCPlugin/pipes/server_"+port);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
@@ -252,6 +263,7 @@ public class syncMain
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		*/
 /*
 		try {
 			if(oos==null)

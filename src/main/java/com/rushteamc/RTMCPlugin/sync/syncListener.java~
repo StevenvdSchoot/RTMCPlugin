@@ -85,7 +85,11 @@ public class syncListener extends Thread
 				{
 				case CHAT_PUBLIC:
 					publicChat pcm = (publicChat)msg;
-					Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
+					// Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
+					String str = String.format(pcm.format,pcm.playerName,pcm.message);
+					for(Player p : Bukkit.getOnlinePlayers()){
+						p.sendMessage(str);
+					}
 					break;
 				case CHAT_ADMIN:
 					adminChat amc = (adminChat)msg;
@@ -115,7 +119,6 @@ public class syncListener extends Thread
 					System.out.println("[RTMCPlugin][SYNC] Received message with unknown type!");
 				}
 			} catch (IOException e) {
-				// TODO: Try reconnect...
 				// System.out.println("[RTMCPlugin][SYNC] Cought IOException, trying to reconnect!");
 				try {
 					inputStream = new FileInputStream(PIPE_PATH + pipeNum);

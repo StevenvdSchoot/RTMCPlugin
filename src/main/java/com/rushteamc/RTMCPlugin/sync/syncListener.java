@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.message.*;
@@ -63,6 +64,8 @@ public class syncListener extends Thread
 			e.printStackTrace();
 		}
 		this.interrupt();
+		if( fd.exists() )
+			fd.delete();
 	}
 	
 	public void run()
@@ -85,7 +88,12 @@ public class syncListener extends Thread
 				{
 				case CHAT_PUBLIC:
 					publicChat pcm = (publicChat)msg;
-					Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
+					// Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
+					System.out.println("[RTMCPlugin][SYNC][listener] Sending message: " + String.format(pcm.format,pcm.playerName,pcm.message));
+					String str = String.format(pcm.format,pcm.playerName,pcm.message);
+					for(Player p : Bukkit.getOnlinePlayers()){
+						p.sendMessage(str);
+					}
 					break;
 				case CHAT_ADMIN:
 					adminChat amc = (adminChat)msg;
