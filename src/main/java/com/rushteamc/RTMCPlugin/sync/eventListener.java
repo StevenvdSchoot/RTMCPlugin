@@ -84,5 +84,25 @@ public class eventListener implements Listener
 		playerDeath message = new playerDeath(event.getEntity().getDisplayName(),event.getDeathMessage());
 		syncmain.sendMessage(message);
 	}
+
+	@EventHandler
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		if (event.isCancelled())
+			return;
+		
+		String command = event.getMessage();
+		if (command == null)
+			return;
+
+		if (command.toLowerCase().startsWith("/me ")) {
+			System.out.println("[RTMCPlugin][SYNC] Player name: " + event.getPlayer().getDisplayName());
+			System.out.println("[RTMCPlugin][SYNC] Me string: " + command.substring(command.indexOf(" ")).trim());
+			meChat msg = new meChat(event.getPlayer().getDisplayName(), command.substring(command.indexOf(" ")).trim());
+			if(msg == null)
+				System.out.println("[RTMCPlugin][SYNC] Trying to send null??");
+			else
+				syncmain.sendMessage(msg);
+		}
+	}
 	
 }

@@ -10,6 +10,5 @@ public class playerLeave extends message
 	{
 		this.playerName = playerName;
 		this.message = message;
-		type = messageType.PLAYER_LEAVE;
 	}
 }

@@ -61,6 +61,8 @@ public class syncListener extends Thread
 	private void sendToAllOnlinePlayers(String str)
 	{
 		System.out.println("[RTMCPlugin][SYNC] Broadcasting message: " + str);
+		if(str == null)
+			return;
 		for(Player p : Bukkit.getOnlinePlayers()){
 			p.sendMessage(str);
 		}
@@ -82,53 +84,57 @@ public class syncListener extends Thread
 					}
 					System.out.println("[RTMCPlugin][SYNC] Connected to: " + filename);
 				}
-				message msg = (message)objectInputStream.readObject();
-				switch(msg.type)
+				Object obj = objectInputStream.readObject();
+				if( obj instanceof publicChat )
 				{
-				case CHAT_PUBLIC:
-					publicChat pcm = (publicChat)msg;
-					// Bukkit.getServer().broadcastMessage( String.format(pcm.format,pcm.playerName,pcm.message) );
-					sendToAllOnlinePlayers(String.format(pcm.format,pcm.playerName,pcm.message));
-					break;
-				case CHAT_ADMIN:
-					adminChat amc = (adminChat)msg;
-					adminChatMain.sendAdminChatMessage(amc.playerName, amc.message);
-					break;
-				case CHAT_ME:
-					meChat mc = (meChat)msg;
-					sendToAllOnlinePlayers( "* " + mc.playerName + " " + mc.message );
-					break;
-				case PLAYER_JOIN:
-					playerJoin pj = (playerJoin)msg;
-					sendToAllOnlinePlayers( pj.message );
-					break;
-				case PLAYER_LEAVE:
-					playerLeave pl = (playerLeave)msg;
-					sendToAllOnlinePlayers( pl.message );
-					break;
-				case PLAYER_KICK:
-					playerKick pk = (playerKick)msg;
-					sendToAllOnlinePlayers( pk.message );
-					break;
-				case PLAYER_DEATH:
-					playerDeath pd = (playerDeath)msg;
-					sendToAllOnlinePlayers( pd.message );
-					break;
-				default:
-					sendToAllOnlinePlayers("[RTMCPlugin][SYNC] Received message with unknown type!");
+					publicChat msg = (publicChat)obj;
+					sendToAllOnlinePlayers(String.format(msg.format,msg.playerName,msg.message));
+				}
+				else if( obj instanceof adminChat )
+				{
+					adminChat msg = (adminChat)obj;
+					adminChatMain.sendAdminChatMessage(msg.playerName, msg.message);
+				}
+				else if( obj instanceof meChat )
+				{
+					meChat msg = (meChat)obj;
+					sendToAllOnlinePlayers( "* " + msg.playerName + " " + msg.message );
+				}
+				else if( obj instanceof playerJoin )
+				{
+					playerJoin msg = (playerJoin)obj;
+					sendToAllOnlinePlayers( msg.message );
+				}
+				else if( obj instanceof playerLeave )
+				{
+					playerLeave msg = (playerLeave)obj;
+					sendToAllOnlinePlayers( msg.message );
+				}
+				else if( obj instanceof playerKick )
+				{
+					playerKick msg = (playerKick)obj;
+					sendToAllOnlinePlayers( msg.message );
+				}
+				else if( obj instanceof playerDeath )
+				{
+					playerDeath msg = (playerDeath)obj;
+					sendToAllOnlinePlayers( msg.message );
 				}
 			} catch (IOException e) {
-				try {
-					objectInputStream.close();
-					inputStream.close();
-				} catch(IOException e2) {
-					e2.printStackTrace();
-				}
+				if(objectInputStream != null)
+					try {objectInputStream.close();} catch (IOException e2) {}
+				if(inputStream != null)
+					try {inputStream.close();} catch (IOException e2) {}
 				objectInputStream = null;
 				inputStream = null;
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				if(objectInputStream != null)
+					try {objectInputStream.close();} catch (IOException e2) {}
+				if(inputStream != null)
+					try {inputStream.close();} catch (IOException e2) {}
+				objectInputStream = null;
+				inputStream = null;
 			}
 		}
 		System.out.println("[RTMCPlugin][SYNC] Listener closed! Please reopen by typing \"/rtmcplugin sync reset\" in the console.");

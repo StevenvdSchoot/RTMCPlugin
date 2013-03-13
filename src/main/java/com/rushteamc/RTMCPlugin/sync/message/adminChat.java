@@ -10,7 +10,6 @@ public class adminChat extends message
 	{
 		this.playerName = playerName;
 		this.message = message;
-		type = messageType.CHAT_ADMIN;
 	}
 	
 }

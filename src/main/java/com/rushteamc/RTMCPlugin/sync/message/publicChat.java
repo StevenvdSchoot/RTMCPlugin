@@ -12,7 +12,6 @@ public class publicChat extends message
 		this.playerName = playerName;
 		this.format = format;
 		this.message = message;
-		type = messageType.CHAT_PUBLIC;
 	}
 	
 }

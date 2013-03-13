@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.syncMain;
-import com.rushteamc.RTMCPlugin.sync.message.meChat;
 
 public class RTMCPlugin extends JavaPlugin
 {
@@ -111,10 +110,6 @@ public class RTMCPlugin extends JavaPlugin
 		case "amsg":
 			adminChat.sendAdminChat(sender.getName(), joinArguments(args) );
 			return true;
-		case "me":
-			meChat message = new meChat(sender.getName(), joinArguments(args) );
-			sync.sendMessage(message);
-			return false;
 		case "msg":
 			//adminChat.sendAdminChat(sender.getName(), joinArguments(args) );
 			return false;
