@@ -1,8 +1,7 @@
 package com.rushteamc.RTMCPlugin.sync.message;
 
-public class playerDeath extends message
+public class playerDeath implements message
 {
-	private static final long serialVersionUID = -2467790216573477440L;
 	public String playerName;
 	public String message;
 	

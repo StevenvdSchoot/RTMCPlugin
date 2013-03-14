@@ -1,8 +1,7 @@
 package com.rushteamc.RTMCPlugin.sync.message;
 
-public class publicChat extends message
+public class publicChat implements message
 {
-	private static final long serialVersionUID = -5000195932812807688L;
 	public String playerName;
 	public String message;
 	public String format;

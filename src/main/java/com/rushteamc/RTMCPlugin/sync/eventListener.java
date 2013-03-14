@@ -21,7 +21,7 @@ public class eventListener implements Listener
 	private PermissionManager permissions;
 	private FileConfiguration config;
 	syncMain syncmain;
-	private String format;
+	public String format;
 	
 	public eventListener(syncMain syncmain, FileConfiguration config)
 	{
@@ -54,7 +54,9 @@ public class eventListener implements Listener
 	public void onAsyncPlayerChatSeccond(AsyncPlayerChatEvent event)
 	{
 		publicChat message = new publicChat(event.getFormat(),event.getPlayer().getDisplayName(),event.getMessage());
-		syncmain.sendMessage(message);
+		// syncmain.sendMessage(message);
+		Player player = event.getPlayer();
+		syncmain.sendMessage( new chatPublicFormatted(player.getName(),player.getWorld().getName(),event.getMessage()) );
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -98,10 +100,9 @@ public class eventListener implements Listener
 			System.out.println("[RTMCPlugin][SYNC] Player name: " + event.getPlayer().getDisplayName());
 			System.out.println("[RTMCPlugin][SYNC] Me string: " + command.substring(command.indexOf(" ")).trim());
 			meChat msg = new meChat(event.getPlayer().getDisplayName(), command.substring(command.indexOf(" ")).trim());
-			if(msg == null)
-				System.out.println("[RTMCPlugin][SYNC] Trying to send null??");
-			else
-				syncmain.sendMessage(msg);
+			syncmain.sendMessage(msg);
+		} else if (command.toLowerCase().startsWith("/pex ")) {
+			;
 		}
 	}
 	

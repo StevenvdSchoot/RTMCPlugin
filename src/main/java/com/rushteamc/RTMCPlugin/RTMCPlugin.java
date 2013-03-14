@@ -1,9 +1,11 @@
 package com.rushteamc.RTMCPlugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.rushteamc.RTMCPlugin.ChatManager.ChatFormatter;
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.syncMain;
 
@@ -11,6 +13,7 @@ public class RTMCPlugin extends JavaPlugin
 {
 	public syncMain sync;
 	public adminChatMain adminChat;
+	public ChatFormatter chatFormatter;
 	
 	public void onLoad()
 	{
@@ -19,23 +22,14 @@ public class RTMCPlugin extends JavaPlugin
 	
 	public void onEnable()
 	{
-		System.out.println("[RTMCPlugin] Initiazing synchronizer!");
 		sync = new syncMain(this);
-		System.out.println("[RTMCPlugin] Initiazing adminchat!");
 		adminChat = new adminChatMain(this);
-		System.out.println("[RTMCPlugin] Done initiazing!");
-		//Bukkit.addFakeOnline("test");
-		//getServer().addFakeOnline("test1");
-		//getServer().addFakeOnline("test2");
-		//getServer().addFakeOnline("test3");
+		chatFormatter = new ChatFormatter(getConfig());
 	}
 	
 	public void onDisable()
 	{
 		sync.unload();
-		//getServer().removeFakeOnline("test1");
-		//getServer().removeFakeOnline("test2");
-		//getServer().removeFakeOnline("test3");
 	}
 	
 	private String joinArguments(String[] args)
@@ -53,7 +47,9 @@ public class RTMCPlugin extends JavaPlugin
 		switch(cmd.getName())
 		{
 		case "rtmctest":
-			//sync.sendTestPacket( joinArguments(args) );
+			// TODO: remove this command.
+			String str = ChatFormatter.format("STSc", "world", "HI");
+			Bukkit.broadcastMessage(str);
 			return true;
 		case "rtmcsync":
 			int i = -1;
@@ -81,7 +77,7 @@ public class RTMCPlugin extends JavaPlugin
 				switch(args[i])
 				{
 				case "in":
-					/*
+					/* TODO: remove this command
 					if(sync == null)
 						sync = new syncMain(this);
 					else
@@ -89,7 +85,7 @@ public class RTMCPlugin extends JavaPlugin
 					*/
 					break;
 				case "out":
-					/*
+					/* TODO: remove this command
 					if(sync == null)
 						sync = new syncMain(this);
 					else

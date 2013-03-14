@@ -2,7 +2,7 @@ package com.rushteamc.RTMCPlugin.sync.message;
 
 import java.io.Serializable;
 
-public interface message extends Serializable
+public interface MessageNew extends Serializable
 {
-	;
+	public void execute();
 }
