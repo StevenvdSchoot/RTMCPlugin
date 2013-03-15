@@ -18,45 +18,22 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class eventListener implements Listener
 {
-	private PermissionManager permissions;
-	private FileConfiguration config;
 	syncMain syncmain;
 	public String format;
 	
 	public eventListener(syncMain syncmain, FileConfiguration config)
 	{
 		this.syncmain = syncmain;
-		this.config = config;
-		permissions = PermissionsEx.getPermissionManager();
 		format = config.getString("chat.format.default").replace('&', ChatColor.COLOR_CHAR);
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onAsyncPlayerChatFirst(AsyncPlayerChatEvent event)
-	{
-		Player player = event.getPlayer();
-		String worldName = player.getWorld().getName();
-		PermissionUser user = permissions.getUser(player);
-		PermissionGroup[] userGroups = user.getGroups(worldName);
-		PermissionGroup userGroup = userGroups[0];
-		int maxRank = userGroups[0].getRank();
-		for(PermissionGroup group : userGroups )
-		{
-			if(group.getRank() > maxRank)
-				userGroup = group;
-		}
-		if( config.isString("chat.worlds." + worldName ) )
-			worldName = config.getString("chat.worlds." + worldName ).replace('&', ChatColor.COLOR_CHAR);
-		event.setFormat( format.replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", userGroup.getName() + ChatColor.RESET).replace("{PLAYERNAME}", "%s" + ChatColor.RESET).replace("{MESSAGE}", "%s" + ChatColor.RESET) );
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onAsyncPlayerChatSeccond(AsyncPlayerChatEvent event)
 	{
-		publicChat message = new publicChat(event.getFormat(),event.getPlayer().getDisplayName(),event.getMessage());
+		// publicChat message = new publicChat(event.getFormat(),event.getPlayer().getDisplayName(),event.getMessage());
 		// syncmain.sendMessage(message);
 		Player player = event.getPlayer();
-		syncmain.sendMessage( new chatPublicFormatted(player.getName(),player.getWorld().getName(),event.getMessage()) );
+		syncmain.sendMessage2( new FormattedMessage(player, event.getMessage()) );
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -87,7 +64,7 @@ public class eventListener implements Listener
 		syncmain.sendMessage(message);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (event.isCancelled())
 			return;

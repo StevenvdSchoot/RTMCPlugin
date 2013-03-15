@@ -3,11 +3,10 @@ package com.rushteamc.RTMCPlugin.sync;
 import java.io.*;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
-import com.rushteamc.RTMCPlugin.ChatManager.ChatFormatter;
+import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 import com.rushteamc.RTMCPlugin.sync.message.*;
 
 public class syncListener extends Thread
@@ -87,7 +86,12 @@ public class syncListener extends Thread
 					System.out.println("[RTMCPlugin][SYNC] Connected to: " + filename);
 				}
 				Object obj = objectInputStream.readObject();
-				if( obj instanceof publicChat )
+				if( obj instanceof MessageNew )
+				{
+					MessageNew msg = (MessageNew)obj;
+					msg.execute();
+				}
+				else if( obj instanceof publicChat )
 				{
 					publicChat msg = (publicChat)obj;
 					sendToAllOnlinePlayers(String.format(msg.format,msg.playerName,msg.message));
@@ -135,7 +139,7 @@ public class syncListener extends Thread
 				else if( obj instanceof chatPublicFormatted )
 				{
 					chatPublicFormatted msg = (chatPublicFormatted)obj;
-					sendToAllOnlinePlayers( ChatFormatter.format(msg.playername, msg.worldname, msg.message) );
+					ChatManager.sendMessageFormatted(msg.playername, msg.worldname, msg.message);
 				}
 			} catch (IOException e) {
 				if(objectInputStream != null)

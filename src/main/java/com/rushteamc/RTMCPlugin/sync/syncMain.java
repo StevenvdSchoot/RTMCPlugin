@@ -5,6 +5,7 @@ import java.io.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.rushteamc.RTMCPlugin.RTMCPlugin;
+import com.rushteamc.RTMCPlugin.sync.message.MessageNew;
 import com.rushteamc.RTMCPlugin.sync.message.message;
 
 public class syncMain
@@ -106,6 +107,12 @@ public class syncMain
 		// TODO: Extend for infinit servers (more than two)
 		for(syncSender sender : senders)
 			sender.sendMessage(message);
+	}
+
+	public void sendMessage2(MessageNew formattedMessage)
+	{
+		for(syncSender sender : senders)
+			sender.sendMessage2(formattedMessage);
 	}
 	
 }

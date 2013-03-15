@@ -1,12 +1,13 @@
 package com.rushteamc.RTMCPlugin.sync.message;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.rushteamc.RTMCPlugin.ChatManager.ChatFormatter;
+import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 
 public class FormattedMessage implements MessageNew
 {
+	private static final long serialVersionUID = 1L;
+	
 	private String playername;
 	private String playerworld;
 	private String message;
@@ -21,10 +22,7 @@ public class FormattedMessage implements MessageNew
 	@Override
 	public void execute()
 	{
-		String msg = ChatFormatter.format(playername, playerworld, message);
-		Player source = Bukkit.getPlayer(playername);
-		for( Player player : Bukkit.getOnlinePlayers())
-			player.sendMessage(msg);
+		ChatManager.sendMessageFormatted(playername, playerworld, message);
 	}
 	
 }

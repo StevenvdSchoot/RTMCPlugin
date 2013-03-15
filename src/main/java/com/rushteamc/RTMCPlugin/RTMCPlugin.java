@@ -1,11 +1,10 @@
 package com.rushteamc.RTMCPlugin;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.rushteamc.RTMCPlugin.ChatManager.ChatFormatter;
+import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.syncMain;
 
@@ -13,7 +12,6 @@ public class RTMCPlugin extends JavaPlugin
 {
 	public syncMain sync;
 	public adminChatMain adminChat;
-	public ChatFormatter chatFormatter;
 	
 	public void onLoad()
 	{
@@ -24,7 +22,7 @@ public class RTMCPlugin extends JavaPlugin
 	{
 		sync = new syncMain(this);
 		adminChat = new adminChatMain(this);
-		chatFormatter = new ChatFormatter(getConfig());
+		ChatManager.setup(this);
 	}
 	
 	public void onDisable()
@@ -48,8 +46,7 @@ public class RTMCPlugin extends JavaPlugin
 		{
 		case "rtmctest":
 			// TODO: remove this command.
-			String str = ChatFormatter.format("STSc", "world", "HI");
-			Bukkit.broadcastMessage(str);
+			ChatManager.sendMessageFormatted("STSc", "world", "HI");
 			return true;
 		case "rtmcsync":
 			int i = -1;
