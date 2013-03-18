@@ -6,11 +6,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
-import com.rushteamc.RTMCPlugin.sync.syncMain;
+import com.rushteamc.RTMCPlugin.sync.Synchronizer;
 
 public class RTMCPlugin extends JavaPlugin
 {
-	public syncMain sync;
+	public Synchronizer sync;
 	public adminChatMain adminChat;
 	
 	public void onLoad()
@@ -20,7 +20,7 @@ public class RTMCPlugin extends JavaPlugin
 	
 	public void onEnable()
 	{
-		sync = new syncMain(this);
+		sync = new Synchronizer(this);
 		adminChat = new adminChatMain(this);
 		ChatManager.setup(this);
 	}

@@ -2,11 +2,6 @@ package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
-import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 import com.rushteamc.RTMCPlugin.sync.message.*;
 
 public class syncListener extends Thread
@@ -59,16 +54,6 @@ public class syncListener extends Thread
 			fd.delete();
 	}
 	
-	private void sendToAllOnlinePlayers(String str)
-	{
-		System.out.println("[RTMCPlugin][SYNC] Broadcasting message: " + str);
-		if(str == null)
-			return;
-		for(Player p : Bukkit.getOnlinePlayers()){
-			p.sendMessage(str);
-		}
-	}
-	
 	public void run()
 	{
 		System.out.println("[RTMCPlugin][SYNC] Trying to listen to: " + filename);
@@ -86,60 +71,14 @@ public class syncListener extends Thread
 					System.out.println("[RTMCPlugin][SYNC] Connected to: " + filename);
 				}
 				Object obj = objectInputStream.readObject();
-				if( obj instanceof MessageNew )
+				if( obj instanceof Message )
 				{
-					MessageNew msg = (MessageNew)obj;
+					Message msg = (Message)obj;
 					msg.execute();
 				}
-				else if( obj instanceof publicChat )
+				else
 				{
-					publicChat msg = (publicChat)obj;
-					sendToAllOnlinePlayers(String.format(msg.format,msg.playerName,msg.message));
-				}
-				else if( obj instanceof adminChat )
-				{
-					adminChat msg = (adminChat)obj;
-					adminChatMain.sendAdminChatMessage(msg.playerName, msg.message);
-				}
-				else if( obj instanceof meChat )
-				{
-					meChat msg = (meChat)obj;
-					sendToAllOnlinePlayers( "* " + msg.playerName + " " + msg.message );
-				}
-				else if( obj instanceof playerJoin )
-				{
-					playerJoin msg = (playerJoin)obj;
-					sendToAllOnlinePlayers( msg.message );
-				}
-				else if( obj instanceof playerLeave )
-				{
-					playerLeave msg = (playerLeave)obj;
-					sendToAllOnlinePlayers( msg.message );
-				}
-				else if( obj instanceof playerKick )
-				{
-					playerKick msg = (playerKick)obj;
-					sendToAllOnlinePlayers( msg.message );
-				}
-				else if( obj instanceof playerDeath )
-				{
-					playerDeath msg = (playerDeath)obj;
-					sendToAllOnlinePlayers( msg.message );
-				}
-				else if( obj instanceof chatAdmin )
-				{
-					chatAdmin msg = (chatAdmin)obj;
-					adminChatMain.sendAdminChatMessage( msg.playername, msg.message );
-				}
-				else if( obj instanceof chatPublic )
-				{
-					chatPublic msg = (chatPublic)obj;
-					sendToAllOnlinePlayers( msg.message );
-				}
-				else if( obj instanceof chatPublicFormatted )
-				{
-					chatPublicFormatted msg = (chatPublicFormatted)obj;
-					ChatManager.sendMessageFormatted(msg.playername, msg.worldname, msg.message);
+					// TODO: Do some error handling here...
 				}
 			} catch (IOException e) {
 				if(objectInputStream != null)

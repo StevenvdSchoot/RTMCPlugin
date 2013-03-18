@@ -3,8 +3,7 @@ package com.rushteamc.RTMCPlugin.sync;
 import java.io.*;
 import java.util.ArrayList;
 
-import com.rushteamc.RTMCPlugin.sync.message.MessageNew;
-import com.rushteamc.RTMCPlugin.sync.message.message;
+import com.rushteamc.RTMCPlugin.sync.message.Message;
 
 public class syncSender extends Thread
 {
@@ -14,7 +13,7 @@ public class syncSender extends Thread
 	private OutputStream outputStream;
 	private ObjectOutputStream objectOutputStream;
 	
-	private ArrayList<MessageNew> objList = new ArrayList<MessageNew>();
+	private ArrayList<Message> objList = new ArrayList<Message>();
 	
 	public syncSender(String filename)
 	{
@@ -27,13 +26,8 @@ public class syncSender extends Thread
 		this.interrupt();
 		close();
 	}
-	
-	public void sendMessage(message msg)
-	{
-		//objList.add(msg);
-	}
 
-	public void sendMessage2(MessageNew msg)
+	public void sendMessage2(Message msg)
 	{
 		objList.add(msg);
 	}
@@ -93,7 +87,7 @@ public class syncSender extends Thread
 				try {
 					//System.out.println("Sending messages..."); 
 					// message msg = objList.get(0);
-					MessageNew msg = objList.get(0);
+					Message msg = objList.get(0);
 					objectOutputStream.writeObject(msg);
 					objList.remove(msg);
 				} catch (IOException e) {

@@ -5,21 +5,17 @@ import java.io.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.rushteamc.RTMCPlugin.RTMCPlugin;
-import com.rushteamc.RTMCPlugin.sync.message.MessageNew;
-import com.rushteamc.RTMCPlugin.sync.message.message;
+import com.rushteamc.RTMCPlugin.sync.message.Message;
 
-public class syncMain
+public class Synchronizer
 {
-	public int syncReceiverPort; // TODO: remove this variable
-	public int[] syncTransmitterPorts = new int[0]; // TODO: remove this variable
+	private static String pipe_prefix;
+	private static int numServers;
+	private static int serverID;
+	private static syncListener listeners[];
+	private static syncSender senders[];
 	
-	private String pipe_prefix;
-	private int numServers;
-	private int serverID;
-	private syncListener listeners[];
-	private syncSender senders[];
-	
-	public syncMain(RTMCPlugin main)
+	public Synchronizer(RTMCPlugin main)
 	{
 		FileConfiguration config = main.getConfig();
 		
@@ -49,6 +45,10 @@ public class syncMain
 			if(serverID>=numServers)
 			{
 				System.out.println("[RTMCPlugin][SYNC] All server IDs in use! Could not setup synchronizer.");
+				// TODO: Do some better error handling here. Pipes should all pipes should be removed and recreated by the servers. This way the unused pipes are not recreated and can be used by this server.
+				numServers = 0;
+				listeners = new syncListener[0];
+				senders = new syncSender[0];
 				return;
 			}
 			
@@ -74,6 +74,11 @@ public class syncMain
 				senders[i-1] = new syncSender(pipe_prefix + "_" + String.valueOf(i) + "_" + String.valueOf(serverID) );
 				senders[i-1].start();
 			}
+		}
+		else
+		{
+			listeners = new syncListener[0];
+			senders = new syncSender[0];
 		}
 
 		main.getServer().getPluginManager().registerEvents(new eventListener(this, config), main);
@@ -101,17 +106,11 @@ public class syncMain
 				e1.printStackTrace();
 			}
 	}
-	
-	public void sendMessage(message message)
-	{
-		// TODO: Extend for infinit servers (more than two)
-		for(syncSender sender : senders)
-			sender.sendMessage(message);
-	}
 
-	public void sendMessage2(MessageNew formattedMessage)
+	public static void sendMessage(Message formattedMessage)
 	{
 		for(syncSender sender : senders)
+			// TODO: Do null pointer check (and solve null pointers...)
 			sender.sendMessage2(formattedMessage);
 	}
 	
