@@ -2,13 +2,41 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>rushteamc</groupId>
     <artifactId>rtmcplugin</artifactId>
-    <version>1.4.7-R0.2-SNAPSHOT</version>
+    <version>2.0</version>
     <name>RTMCPlugin</name>
     <url>https://github.com/rtmc-development-team/RTMCPlugin</url>
+
+    <organization>
+        <name>RTMC-development-team</name>
+        <url>http://rushteamc.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>STSc</id>
+            <name>STSc</name>
+            <email>stsc@rushteamc.com</email>
+            <url>http://rushteamc.com</url>
+            <timezone>+1</timezone>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT-LICENSE</name>
+            <url>./MIT-LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <java-version>1.7</java-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bukkit.version>1.5.1-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
     <scm>
@@ -45,32 +73,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>3.0</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArgument>-Xlint:-options</compilerArgument>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.google</pattern>
-                                    <shadedPattern>guava10.com.google</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>RTMC Plugin</Implementation-Title>
+                            <Implementation-Version>${describe}</Implementation-Version>
+                            <Implementation-Vendor>RTMCPlugin</Implementation-Vendor>
+                            <Bukkit-Version>${bukkit.version}</Bukkit-Version>
+                            <Specification-Title>RTMC Plugin</Specification-Title>
+                            <Specification-Version>${project.version}</Specification-Version>
+                            <Specification-Vendor>RTMCPlugin</Specification-Vendor>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -108,7 +135,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>${project.version}</version>
+            <version>${bukkit.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
