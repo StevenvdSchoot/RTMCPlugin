@@ -1,31 +1,31 @@
 package com.rushteamc.RTMCPlugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
+import com.rushteamc.RTMCPlugin.Permissions.Permissions;
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.Synchronizer;
 
 public class RTMCPlugin extends JavaPlugin
 {
-	public static FileConfiguration config;
-	public static PluginManager pluginmanager;
+	public static RTMCPlugin rtmcplugin;
 	
 	public void onLoad()
 	{
-		;
+		rtmcplugin = this;
 	}
 	
 	public void onEnable()
 	{
-		config = getConfig();
 		Synchronizer.init(this);
 		adminChatMain.init(this);
 		ChatManager.init(this);
+		Permissions.init(this);
 	}
 	
 	public void onDisable()
@@ -50,6 +50,9 @@ public class RTMCPlugin extends JavaPlugin
 		case "rtmctest":
 			// TODO: remove this command.
 			ChatManager.sendMessageFormatted("STSc", "world", "HI");
+			//for(Player player : Bukkit.getOnlinePlayers())
+			//	Permissions.updateUserPermissions(player);
+			System.out.println(Permissions.userDetails("STSc"));
 			return true;
 		case "rtmcsync":
 			int i = -1;

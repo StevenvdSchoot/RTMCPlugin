@@ -146,7 +146,8 @@ public class ChatManager
 	public static String format(String format, String playerName, String worldName, String message)
 	{
 		// TODO: Throw player not found exception.
-		return format(format, playerName, Bukkit.getPlayer(playerName).getDisplayName() , worldName, message);
+		Player player = Bukkit.getPlayer(playerName);
+		return format(format, playerName, (player==null)?"":player.getDisplayName() , worldName, message);
 	}
 	
 	public static String format(String format,String playerName, String playerNameString, String worldName, String message)

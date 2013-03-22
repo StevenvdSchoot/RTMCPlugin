@@ -36,7 +36,7 @@ permissions:
 commands:
  rtmctest:
   description: Just a global test command.
-  permission: RTMCPlugin.rtmctest
+  .permission: RTMCPlugin.rtmctest
   permission-message: You do not have permissions to use the test command!
   usage: /rtmctest some random parameters
  rtmcsync:
