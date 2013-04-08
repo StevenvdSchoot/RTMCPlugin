@@ -12,3 +12,8 @@ We use maven to handle our dependencies.
 * Check out and install [Bukkit](http://github.com/Bukkit/Bukkit)
     * *Note*: this is not needed as maven will uses a repository that has Bukkit too, but you might have a newer one (with your own changes :D)
 * Check out this repo and: `mvn clean package`
+
+Jenkins
+-------
+
+We have a Jenkins repo on [rushteamc.com](http://rushteamc.com:8080/job/RTMCPlugin/) where you can find the latest artifects.

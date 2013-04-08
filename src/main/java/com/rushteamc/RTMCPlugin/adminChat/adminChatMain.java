@@ -13,7 +13,6 @@ import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 
 public class adminChatMain
 {
-	private static RTMCPlugin rtmcplugin;
 	private static final String AdminChatFotmat = "adminchat";
 	
 	public adminChatMain(RTMCPlugin main)
@@ -21,10 +20,9 @@ public class adminChatMain
 		;
 	}
 	
-	public static void init(RTMCPlugin rtmcplugin)
+	public static void init()
 	{
-		adminChatMain.rtmcplugin = rtmcplugin;
-		rtmcplugin.getServer().getPluginManager().registerEvents(new adminChatEventListener(), rtmcplugin);
+		RTMCPlugin.rtmcplugin.getServer().getPluginManager().registerEvents(new adminChatEventListener(), RTMCPlugin.rtmcplugin);
 	}
 	
 	public static boolean getAdminChatEnabled(Player player)
@@ -45,7 +43,7 @@ public class adminChatMain
 		Player player = Bukkit.getPlayer(playername);
 		boolean enable = !getAdminChatEnabled(player);
 		System.out.println("[RTMCPlugin][ADMINCHAT] Player " + playername + " turned adminchat "+((enable)?"on":"off"));
-		player.setMetadata("adminChat", new FixedMetadataValue(rtmcplugin,(enable)));
+		player.setMetadata("adminChat", new FixedMetadataValue(RTMCPlugin.rtmcplugin,(enable)));
 		player.sendMessage( ChatColor.RED + (enable?"Enabled":"Disabled") + " admin chat.");
 	}
 	

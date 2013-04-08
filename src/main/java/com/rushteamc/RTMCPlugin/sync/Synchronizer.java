@@ -2,7 +2,11 @@ package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.RTMCPlugin;
 import com.rushteamc.RTMCPlugin.sync.message.Message;
@@ -20,9 +24,9 @@ public class Synchronizer
 		;
 	}
 	
-	public static void init(RTMCPlugin rtmcplugin)
+	public static void init()
 	{
-		FileConfiguration config = rtmcplugin.getConfig();
+		FileConfiguration config = RTMCPlugin.rtmcplugin.getConfig();
 		
 		if(config.isString("sync.path"))
 			pipe_prefix = (String)config.get("sync.path");
@@ -86,7 +90,21 @@ public class Synchronizer
 			senders = new syncSender[0];
 		}
 		
-		rtmcplugin.getServer().getPluginManager().registerEvents(new eventListener(config), rtmcplugin);
+		RTMCPlugin.rtmcplugin.getServer().getPluginManager().registerEvents(new EventListener(config), RTMCPlugin.rtmcplugin);
+	}
+	
+	public static void addPlayer(String playername)
+	{
+		((CraftServer) Bukkit.getServer()).getServer().getPlayerList().c(new FakeEntityPlayer(playername));
+	}
+	
+	public static void removePlayer(String playername)
+	{
+		Player player = Bukkit.getPlayer(playername);
+		if(player != null)
+		{
+			((CraftServer) Bukkit.getServer()).getServer().getPlayerList().disconnect(((CraftPlayer)player).getHandle());
+		}
 	}
 	
 	public static void unload()

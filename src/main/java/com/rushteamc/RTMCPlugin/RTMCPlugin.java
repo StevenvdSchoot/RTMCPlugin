@@ -1,13 +1,13 @@
 package com.rushteamc.RTMCPlugin;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
-import com.rushteamc.RTMCPlugin.Permissions.Permissions;
+import com.rushteamc.RTMCPlugin.PermissionsManager.PermissionsManager;
+import com.rushteamc.RTMCPlugin.Reporter.Reporter;
+import com.rushteamc.RTMCPlugin.RestrictionManager.RestrictionManager;
 import com.rushteamc.RTMCPlugin.adminChat.adminChatMain;
 import com.rushteamc.RTMCPlugin.sync.Synchronizer;
 
@@ -22,10 +22,12 @@ public class RTMCPlugin extends JavaPlugin
 	
 	public void onEnable()
 	{
-		Synchronizer.init(this);
-		adminChatMain.init(this);
-		ChatManager.init(this);
-		Permissions.init(this);
+		Synchronizer.init();
+		adminChatMain.init();
+		ChatManager.init();
+		PermissionsManager.init();
+		RestrictionManager.init();
+		Reporter.init();
 	}
 	
 	public void onDisable()
@@ -48,11 +50,13 @@ public class RTMCPlugin extends JavaPlugin
 		switch(cmd.getName())
 		{
 		case "rtmctest":
+			//Synchronizer.fp.chat("HOI!");
 			// TODO: remove this command.
-			ChatManager.sendMessageFormatted("STSc", "world", "HI");
+			//ChatManager.sendMessageFormatted("STSc", "world", "HI");
 			//for(Player player : Bukkit.getOnlinePlayers())
 			//	Permissions.updateUserPermissions(player);
-			System.out.println(Permissions.userDetails("STSc"));
+			//PermissionsManager.test(args[0]);
+			//System.out.println("Has permission modifyworld.blocks.destroy.27591:?*: " + ((Bukkit.getPlayer(args[0]).hasPermission("modifyworld.blocks.destroy.27591:?*") == true)?"true":"false") );
 			return true;
 		case "rtmcsync":
 			int i = -1;

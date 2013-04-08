@@ -12,27 +12,21 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.RTMCPlugin;
+import com.rushteamc.RTMCPlugin.PermissionsManager.PermissionsManager;
 import com.rushteamc.RTMCPlugin.sync.Synchronizer;
 import com.rushteamc.RTMCPlugin.sync.message.*;
 
-import ru.tehkode.permissions.PermissionGroup;
-import ru.tehkode.permissions.PermissionManager;
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
 public class ChatManager
 {
-	private static PermissionManager permissions;
 	private static FileConfiguration config;
 	private static Map<String, String> formats = new Hashtable<String, String>();
 	public static final String BaseFormat = "default";
 	
-	public static void init(RTMCPlugin rtmcplugin)
+	public static void init()
 	{
-		ChatManager.config = rtmcplugin.getConfig();
-		ChatManager.permissions = PermissionsEx.getPermissionManager();
+		ChatManager.config = RTMCPlugin.rtmcplugin.getConfig();
 		
-		rtmcplugin.getServer().getPluginManager().registerEvents(new EventListener(), rtmcplugin);
+		RTMCPlugin.rtmcplugin.getServer().getPluginManager().registerEvents(new EventListener(), RTMCPlugin.rtmcplugin);
 
 		addFormats(config.getDefaults().getConfigurationSection("chat.format"));
 		addFormats(config.getConfigurationSection("chat.format"));
@@ -152,21 +146,25 @@ public class ChatManager
 	
 	public static String format(String format,String playerName, String playerNameString, String worldName, String message)
 	{
+		//Map<String, String> options = PermissionsManager.getPlayerOptions(playerName);
+		String[] groups = PermissionsManager.getPlayerGroups(playerName);
+		/*
 		PermissionUser user = permissions.getUser(playerName);
 		PermissionGroup[] userGroups = user.getGroups(worldName);
 		PermissionGroup userGroup = userGroups[0];
-		int maxRank = userGroups[0].getRank();
+		int maxRank = userGroup.getRank();
 		for(PermissionGroup group : userGroups )
 		{
 			if(group.getRank() > maxRank)
 				userGroup = group;
 		}
+		*/
 		if( config.isString("chat.worlds." + worldName ) )
 			worldName = config.getString("chat.worlds." + worldName ).replace('&', ChatColor.COLOR_CHAR);
 		
 		String form = formats.get(format);
 		if(form==null)
 			return null; // TODO: Throw error
-		return form.replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", userGroup.getName() + ChatColor.RESET).replace("{PLAYERNAME}", playerNameString + ChatColor.RESET).replace("{MESSAGE}", message + ChatColor.RESET);
+		return form.replace("{WORLD}", worldName + ChatColor.RESET ).replace("{RANK}", groups[0] + ChatColor.RESET).replace("{PLAYERNAME}", playerNameString + ChatColor.RESET).replace("{MESSAGE}", message + ChatColor.RESET);
 	}
 }
