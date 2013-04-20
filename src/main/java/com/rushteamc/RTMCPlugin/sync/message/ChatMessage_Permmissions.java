@@ -2,7 +2,7 @@ package com.rushteamc.RTMCPlugin.sync.message;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 
-public class ChatMessage_Permmissions implements Message
+public class ChatMessage_Permmissions extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -16,7 +16,7 @@ public class ChatMessage_Permmissions implements Message
 	}
 
 	@Override
-	public void execute()
+	public void run()
 	{
 		ChatManager.sendMessageWithouSync(message, permmisions);
 	}

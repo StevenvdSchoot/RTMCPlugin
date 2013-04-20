@@ -2,7 +2,7 @@ package com.rushteamc.RTMCPlugin.sync.message;
 
 import com.rushteamc.RTMCPlugin.sync.Synchronizer;
 
-public class FakePlayerLogin implements Message
+public class FakePlayerLogin extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -10,12 +10,14 @@ public class FakePlayerLogin implements Message
 	
 	public FakePlayerLogin(String playername)
 	{
+		System.out.println("[RTMCPlugin][SYNC] About to remote login player: " + playername);
 		this.playername = playername;
 	}
 	
 	@Override
-	public void execute()
+	public void run()
 	{
+		System.out.println("[RTMCPlugin][SYNC] About to login player: " + playername);
 		Synchronizer.addPlayer(playername);
 	}
 	

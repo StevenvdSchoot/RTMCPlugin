@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 
-public class FormattedChatMessage implements Message
+public class FormattedChatMessage extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -27,7 +27,7 @@ public class FormattedChatMessage implements Message
 	}
 
 	@Override
-	public void execute()
+	public void run()
 	{
 		ChatManager.sendMessageWithouSync(ChatManager.format(format, playername, playerworld, message));
 	}

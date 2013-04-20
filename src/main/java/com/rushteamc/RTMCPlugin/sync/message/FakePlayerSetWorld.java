@@ -6,7 +6,7 @@ import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-public class FakePlayerSetWorld implements Message
+public class FakePlayerSetWorld extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -20,7 +20,7 @@ public class FakePlayerSetWorld implements Message
 	}
 	
 	@Override
-	public void execute()
+	public void run()
 	{
 		Player player = Bukkit.getPlayer(playername);
 		if(player != null)

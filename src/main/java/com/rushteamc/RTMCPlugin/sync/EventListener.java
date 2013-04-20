@@ -21,7 +21,6 @@ import com.rushteamc.RTMCPlugin.sync.message.FakePlayerKick;
 import com.rushteamc.RTMCPlugin.sync.message.FakePlayerLogin;
 import com.rushteamc.RTMCPlugin.sync.message.FakePlayerLogout;
 import com.rushteamc.RTMCPlugin.sync.message.FakePlayerPeformCommand;
-import com.rushteamc.RTMCPlugin.sync.message.FakePlayerSetWorld;
 
 public class EventListener implements Listener
 {
@@ -74,7 +73,7 @@ public class EventListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
 	{
-		Synchronizer.sendMessage( new FakePlayerSetWorld(event.getPlayer().getName(), event.getPlayer().getWorld().getName()) );
+		// Synchronizer.sendMessage( new FakePlayerSetWorld(event.getPlayer().getName(), event.getPlayer().getWorld().getName()) );
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -91,6 +90,8 @@ public class EventListener implements Listener
 		if( !( player.getHandle() instanceof FakeEntityPlayer) )
 		{
 			if (command.toLowerCase().startsWith("/me ")) {
+				Synchronizer.sendMessage(new FakePlayerPeformCommand(event.getPlayer().getName(), event.getMessage().substring(1)));
+			} else if (command.toLowerCase().startsWith("/a ") || command.toLowerCase().startsWith("/amsg ")) {
 				Synchronizer.sendMessage(new FakePlayerPeformCommand(event.getPlayer().getName(), event.getMessage().substring(1)));
 			} else if (command.toLowerCase().startsWith("/pex ")) {
 				if(!PermissionsManager.managePermissions)

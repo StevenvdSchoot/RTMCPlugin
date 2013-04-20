@@ -2,6 +2,7 @@ package com.rushteamc.RTMCPlugin.sync;
 
 import java.io.*;
 
+import com.rushteamc.RTMCPlugin.RTMCPlugin;
 import com.rushteamc.RTMCPlugin.sync.message.*;
 
 public class syncListener extends Thread
@@ -74,7 +75,7 @@ public class syncListener extends Thread
 				if( obj instanceof Message )
 				{
 					Message msg = (Message)obj;
-					msg.execute();
+					msg.runTask(RTMCPlugin.rtmcplugin);
 				}
 				else
 				{

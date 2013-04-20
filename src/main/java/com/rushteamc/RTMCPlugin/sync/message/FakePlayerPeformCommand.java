@@ -3,7 +3,7 @@ package com.rushteamc.RTMCPlugin.sync.message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class FakePlayerPeformCommand implements Message
+public class FakePlayerPeformCommand extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -17,7 +17,7 @@ public class FakePlayerPeformCommand implements Message
 	}
 	
 	@Override
-	public void execute()
+	public void run()
 	{
 		Player player = Bukkit.getPlayer(playername);
 		if(player != null)

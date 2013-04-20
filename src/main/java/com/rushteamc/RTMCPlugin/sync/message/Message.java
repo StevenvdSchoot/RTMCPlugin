@@ -1,8 +1,9 @@
 package com.rushteamc.RTMCPlugin.sync.message;
 
 import java.io.Serializable;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public interface Message extends Serializable
+public abstract class Message extends BukkitRunnable implements Serializable
 {
-	public void execute();
+	private static final long serialVersionUID = 1L;
 }

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.rushteamc.RTMCPlugin.ChatManager.ChatManager;
 
-public class ChatMessage_Players implements Message
+public class ChatMessage_Players extends Message
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -27,7 +27,7 @@ public class ChatMessage_Players implements Message
 	}
 
 	@Override
-	public void execute()
+	public void run()
 	{
 		Player[] playersObj = new Player[players.length];
 		for(int i = 0;i<players.length;i++)
