@@ -1,21 +1,22 @@
-package com.rushteamc.RTMCPlugin.sync;
+package com.rushteamc.RTMCPlugin.synchronizer;
 
 import java.io.*;
 
-import com.rushteamc.RTMCPlugin.sync.message.*;
+import com.rushteamc.RTMCPlugin.Main;
+import com.rushteamc.RTMCPlugin.synchronizer.Messages.Message;
 
-public class syncListener extends Thread
+public class SynchronizerListener extends Thread
 {
 	private boolean running = true;
 	private String filename;
 	private File fd;
 	private InputStream inputStream;
 	private ObjectInputStream objectInputStream;
-	
-	public syncListener(String filename)
+
+	public SynchronizerListener(String filename)
 	{
 		setDaemon(true);
-		
+
 		this.filename = filename;
 
 		fd = new File(filename);
@@ -36,7 +37,7 @@ public class syncListener extends Thread
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void kill()
 	{
 		running = false;
@@ -53,7 +54,7 @@ public class syncListener extends Thread
 		if( fd.exists() )
 			fd.delete();
 	}
-	
+
 	public void run()
 	{
 		System.out.println("[RTMCPlugin][SYNC] Trying to listen to: " + filename);
@@ -74,7 +75,7 @@ public class syncListener extends Thread
 				if( obj instanceof Message )
 				{
 					Message msg = (Message)obj;
-					msg.execute();
+					msg.runTask(Main.plugin);
 				}
 				else
 				{

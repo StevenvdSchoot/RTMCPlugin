@@ -1,25 +1,25 @@
-package com.rushteamc.RTMCPlugin.sync;
+package com.rushteamc.RTMCPlugin.synchronizer;
 
 import java.io.*;
 import java.util.ArrayList;
 
-import com.rushteamc.RTMCPlugin.sync.message.Message;
+import com.rushteamc.RTMCPlugin.synchronizer.Messages.Message;
 
-public class syncSender extends Thread
+public class SynchronizerSender extends Thread
 {
 	private Boolean running;
 	private String filename;
-	
+
 	private OutputStream outputStream;
 	private ObjectOutputStream objectOutputStream;
-	
+
 	private ArrayList<Message> objList = new ArrayList<Message>();
-	
-	public syncSender(String filename)
+
+	public SynchronizerSender(String filename)
 	{
 		this.filename = filename;
 	}
-	
+
 	public void kill()
 	{
 		running = false;
@@ -31,7 +31,7 @@ public class syncSender extends Thread
 	{
 		objList.add(msg);
 	}
-	
+
 	private boolean open()
 	{
 		File fd = new File(filename);
@@ -46,7 +46,7 @@ public class syncSender extends Thread
 		}
 		return false;
 	}
-	
+
 	private void close()
 	{
 		if(objectOutputStream!=null)
@@ -64,7 +64,7 @@ public class syncSender extends Thread
 		objectOutputStream = null;
 		outputStream = null;
 	}
-	
+
 	public void run()
 	{
 		System.out.println("[RTMCPlugin][SYNC] Trying to send to: " + filename);
@@ -103,5 +103,4 @@ public class syncSender extends Thread
 		}
 		System.out.println("[RTMCPlugin][SYNC] Data sender for " + filename + " died! Please reset the plugin or type \"/rtmcplugin sync reset\" in the console to try reconnect." );
 	}
-	
 }
